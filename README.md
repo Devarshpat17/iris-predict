@@ -6,14 +6,10 @@ This project implements a web application for classifying iris flower species us
 
 ```
 iris-flask-app
-├── src
-│   ├── app.py            # Main entry point of the Flask application
-│   ├── model.py          # Contains the Gaussian Naive Bayes model class
-│   ├── utils.py          # Utility functions for data preprocessing
-│   └── templates
-│       └── index.html    # HTML template for user interface
-├── data
-│   └── Iris.csv          # Dataset used for training the model
+
+├──── templates
+│       └── index.html     # HTML template for user interface
+├── app.py                 # Main entry point of the Flask application   
 ├── requirements.txt       # Project dependencies
 └── README.md              # Project documentation
 ```
@@ -34,11 +30,10 @@ iris-flask-app
 
 3. **Run the application**:
    ```
-   python src/app.py
+   python app.py
    ```
 
-4. **Access the application**:
-   Open your web browser and go to `http://127.0.0.1:5000/` to access the iris flower classification application.
+
 
 ## Usage
 
