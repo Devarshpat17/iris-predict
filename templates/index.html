@@ -1,0 +1,66 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iris Flower Classifier</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
+            min-height: 100vh;
+        }
+        .card {
+            margin-top: 60px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+            border-radius: 18px;
+        }
+        .btn-primary {
+            background: linear-gradient(90deg, #4e54c8 0%, #8f94fb 100%);
+            border: none;
+        }
+        .form-label {
+            font-weight: 500;
+        }
+        .title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #4e54c8;
+            margin-bottom: 18px;
+        }
+        .alert {
+            margin-top: 24px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container d-flex justify-content-center align-items-center">
+        <div class="card p-4 col-md-6">
+            <div class="title text-center">Iris Flower Classifier</div>
+            <form action="/predict" method="POST">
+                <div class="form-group">
+                    <label for="sepalLength" class="form-label">Sepal Length (cm)</label>
+                    <input type="number" step="any" class="form-control" id="sepalLength" name="sepalLength" required>
+                </div>
+                <div class="form-group">
+                    <label for="sepalWidth" class="form-label">Sepal Width (cm)</label>
+                    <input type="number" step="any" class="form-control" id="sepalWidth" name="sepalWidth" required>
+                </div>
+                <div class="form-group">
+                    <label for="petalLength" class="form-label">Petal Length (cm)</label>
+                    <input type="number" step="any" class="form-control" id="petalLength" name="petalLength" required>
+                </div>
+                <div class="form-group">
+                    <label for="petalWidth" class="form-label">Petal Width (cm)</label>
+                    <input type="number" step="any" class="form-control" id="petalWidth" name="petalWidth" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block mt-3">Predict Species</button>
+            </form>
+            {% if prediction %}
+                <div class="alert alert-success text-center" role="alert">
+                    <strong>Predicted Species:</strong> {{ prediction }}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
