@@ -72,7 +72,7 @@ model.load_data('Iris.csv')
 # Check if model pickle exists
 if os.path.exists('model.pkl'):
     model.load('model.pkl')
-    model.train()  # To get accuracy/confusion matrix
+    model.train()  
 else:
     model.train()
     model.save('model.pkl')
@@ -82,8 +82,11 @@ def home():
     accuracy = model.accuracy
     return render_template('index.html', accuracy=accuracy)
 
-@app.route('/predict', methods=['POST'])
+@app.route('/predict', methods=['GET', 'POST'])
 def predict():
+    if request.method == 'GET':
+        return render_template('index.html')
+        
     sepal_length = float(request.form['sepalLength'])
     sepal_width = float(request.form['sepalWidth'])
     petal_length = float(request.form['petalLength'])
