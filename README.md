@@ -41,6 +41,4 @@ iris-flask-app
 - Click on the "Predict" button to classify the iris flower species based on the input measurements.
 - The predicted species will be displayed on the same page.
 
-## License
 
-This project is licensed under the MIT License.
