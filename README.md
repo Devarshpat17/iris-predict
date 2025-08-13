@@ -18,7 +18,7 @@ iris-flask-app
 
 1. **Clone the repository**:
    ```
-   git clone <repository-url>
+   git clone https://github.com/Devarshpat17/iris-predict
    cd iris-flask-app
    ```
 
