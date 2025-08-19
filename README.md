@@ -18,7 +18,7 @@ iris-flask-app
 
 1. **Clone the repository**:
    ```
-   git clone <repository-url>
+   git clone https://github.com/Devarshpat17/iris-predict
    cd iris-flask-app
    ```
 
@@ -41,6 +41,4 @@ iris-flask-app
 - Click on the "Predict" button to classify the iris flower species based on the input measurements.
 - The predicted species will be displayed on the same page.
 
-## License
 
-This project is licensed under the MIT License.
