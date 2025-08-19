@@ -6,6 +6,8 @@ import matplotlib
 import matplotlib.pyplot as plt
 from waitress import serve
 import logging
+import datetime
+from werkzeug.middleware.proxy_fix import ProxyFix  # Add this import
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -65,6 +67,8 @@ class GaussianNaiveBayesModel:
 
 
 app = Flask(__name__)
+# Add ProxyFix middleware to handle proxy headers
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
 
 model = GaussianNaiveBayesModel()
 model.load_data('Iris.csv')
@@ -79,26 +83,98 @@ else:
 
 @app.route('/')
 def home():
+    host = request.headers.get('Host')
     accuracy = model.accuracy
-    return render_template('index.html', accuracy=accuracy)
+    
+    # Handle different domains
+    if host.startswith('api.'):
+        # Return JSON for API domain
+        return {
+            'service': 'Iris Classifier API',
+            'version': '1.0',
+            'status': 'running',
+            'model': {
+                'type': 'Gaussian Naive Bayes',
+                'accuracy': accuracy,
+                'features': ['sepalLength', 'sepalWidth', 'petalLength', 'petalWidth'],
+                'target': 'Species',
+                'classes': ['setosa', 'versicolor', 'virginica']
+            },
+            'endpoints': {
+                'root': '/ - API information (GET)',
+                'predict': '/predict - Make predictions (POST)'
+            },
+            'example_prediction_payload': {
+                'sepalLength': 5.1,
+                'sepalWidth': 3.5,
+                'petalLength': 1.4,
+                'petalWidth': 0.2
+            }
+        }
+    else:
+        # Return HTML for main domain
+        return render_template('index.html', accuracy=accuracy)
 
 @app.route('/predict', methods=['GET', 'POST'])
 def predict():
-    if request.method == 'GET':
-        return render_template('index.html')
-        
-    sepal_length = float(request.form['sepalLength'])
-    sepal_width = float(request.form['sepalWidth'])
-    petal_length = float(request.form['petalLength'])
-    petal_width = float(request.form['petalWidth'])
+    host = request.headers.get('Host')
     
-    prediction = model.predict(sepal_length, sepal_width, petal_length, petal_width)
-    accuracy = model.accuracy
-    return render_template('index.html', prediction=prediction, accuracy=accuracy)
+    if request.method == 'GET':
+        if host.startswith('api.'):
+            return {
+                'message': 'Please send POST request with sepal and petal measurements'
+            }
+        return render_template('index.html')
+    
+    # Handle POST request
+    try:
+        # Get values from form or JSON
+        if host.startswith('api.'):
+            data = request.get_json()
+            sepal_length = float(data['sepalLength'])
+            sepal_width = float(data['sepalWidth'])
+            petal_length = float(data['petalLength'])
+            petal_width = float(data['petalWidth'])
+        else:
+            sepal_length = float(request.form['sepalLength'])
+            sepal_width = float(request.form['sepalWidth'])
+            petal_length = float(request.form['petalLength'])
+            petal_width = float(request.form['petalWidth'])
+        
+        prediction = model.predict(sepal_length, sepal_width, petal_length, petal_width)
+        accuracy = model.accuracy
+        
+        if host.startswith('api.'):
+            return {
+                'success': True,
+                'prediction': {
+                    'species': prediction,
+                    'confidence': accuracy
+                },
+                'input': {
+                    'sepalLength': sepal_length,
+                    'sepalWidth': sepal_width,
+                    'petalLength': petal_length,
+                    'petalWidth': petal_width
+                },
+                'timestamp': datetime.datetime.now().isoformat()
+            }
+        return render_template('index.html', prediction=prediction, accuracy=accuracy)
+        
+    except (KeyError, ValueError) as e:
+        if host.startswith('api.'):
+            return {'error': str(e)}, 400
+        return render_template('index.html', error=str(e))
 
 if __name__ == '__main__':
     logger.info("Starting Iris Classifier application...")
     logger.info("Loading model and starting server...")
-    print("Server is running at http://localhost:5000")
+    print("Server is running behind Nginx reverse proxy")
+    print("Access the application at:")
+    print("- http://localhost")
+    print("- http://abcdp17.com")
+    print("- http://api.abcdp17.com")
     print("Press Ctrl+C to quit")
-    serve(app, host='0.0.0.0', port=5000, _quiet=False)
+    
+    # Start Waitress server
+    serve(app, host='127.0.0.1', port=5000, _quiet=False)
